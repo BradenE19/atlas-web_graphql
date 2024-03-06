@@ -1,90 +1,66 @@
-const express = require('express');
-const expressGraphQL = require('express-graphql');
-const lodash = require('lodash');
-const Task = require("../models/task");
-const Project = require("../models/project");
+const graphql = require('graphql');
+const _ = require('lodash');
+const Project = require('../models/project');
+const Task = require('../models/task');
+const{ GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema } = graphql;
 
 
-const {
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLID,
-  GraphQLString,
-  GraphQLInt,
-  GraphQLList,
-  GraphQLNonNull
-} = require('graphql')
-
-const app = express()
-
-//deleted both arrays of data so we can pull directly from the database
-
-// rootQuery scope
-const RootQueryType = new GraphQLObjectType({
-  name: 'RootQueryType',
-  fields: () => ({
-    Task: {
-    type: TaskType,
-    args: {
-        id: { type: GraphQLString }
-      },
-      resolve: (parent, args) => {
-	  // return lodash.find(arrayTasks, { id: args.id })
-	  return Task.findById(id);
-      }
-    },
-    Project: {
-      type: ProjectType,
-      args: {
-          id: { type: GraphQLString }
-        },
-        resolve: (parent, args) => {
-            // return lodash.find(arrayProjects, { id: args.id })
-	    return Project.findById(id);
-        }
-      },
-      tasks: {
-        type: new GraphQLList(TaskType),
-        resolve: () => Task.find({})
-      },
-      projects: {
-        type: new GraphQLList(ProjectType),
-        resolve: () => Project.find({})
-      }
-  })
-})
-
-const TaskType = new GraphQLObjectType({
+const TaskType = new graphql.GraphQLObjectType({
   name: 'Task',
   fields: () => ({
-    id: { type: (GraphQLID) },
-    projectId: { type: (GraphQLID) },
-    title: { type: (GraphQLString) },
-    weight: { type: (GraphQLInt) },
-    description: { type: (GraphQLString) },
+    id: { type: graphql.GraphQLID },
+    title: { type: graphql.GraphQLString },
+    weight: { type: graphql.GraphQLInt },
+    description: { type: graphql.GraphQLString },
+    project: {
+      type: TaskType,
+      resolve(parent, args) {
+        return Project.findById(parent.projectId);
+      }
+    }
+  })
+});
+
+const RootQuery = new graphql.GraphQLObjectType({
+  name: 'RootQueryType',
+  fields: () => ({
+    task: {
+      type: TaskType,
+      args: { id: {type: graphql.GraphQLID} },
+      resolve(parent, args) {
+        return Task.findById(args.id);
+      }
+    },
     project: {
       type: ProjectType,
-      resolve: (parent, args) => {
-        return Project.findById(parent.projectId);
-        // return lodash.find(arrayTasks, { id: parent.TaskId});
+      args: { id: {type: graphql.GraphQLID} },
+      resolve(parent, args){
+        return Project.findById(args.id);
       }
+    },
+    tasks: {
+      type: new graphql.GraphQLList(TaskType),
+      resolve: () => Task.find({})
+    },
+    projects: {
+      type: new graphql.GraphQLList(ProjectType),
+      resolve: () => Project.find({})
     }
   })
-})
+});
 
-const ProjectType = new GraphQLObjectType({
+const ProjectType = new graphql.GraphQLObjectType({
   name: 'Project',
   fields: () => ({
-    id: { type: (GraphQLID) },
-    title: { type: (GraphQLString) },
-    weight: { type: (GraphQLInt) },
-    description: { type: (GraphQLString) },
+    id: { type: graphql.GraphQLID },
+    title: { type: graphql.GraphQLString },
+    weight: { type: graphql.GraphQLInt },
+    description: { type: graphql.GraphQLString },
     tasks: {
-      type: new GraphQLList(TaskType),
-      resolve: (parent, args) => {
-        return Task.find({projectId: parent.id})
-        // return lodash.find(arrayProjects, { id: parent.ProjectId});
+      type: new graphql.GraphQLList(TaskType),
+      resolve(parent, args) {
+        return Task.find({projectId:parent.id});
       }
     }
   })
-})
+});
