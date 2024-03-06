@@ -64,3 +64,43 @@ const ProjectType = new graphql.GraphQLObjectType({
     }
   })
 });
+
+const Mutation = new graphql.GraphQLObjectType({
+  name: 'Mutation',
+  fields: () => ({
+    addProject: {
+      type: ProjectType,
+      args: {
+        title: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+        weight: { type: new graphql.GraphQLNonNull(graphql.GraphQLInt) },
+        description: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
+      },
+      resolve: (parent, args) => {
+        const newProject = new Project({
+          title: args.title,
+          weight: args.weight,
+          description: args.description
+        });
+        return newProject.save();
+      }
+    },
+    addTask: {
+      type: TaskType,
+      args: {
+        title: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+        weight: { type: new graphql.GraphQLNonNull(graphql.GraphQLInt) },
+        description: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+        projectId: { type: new graphql.GraphQLNonNull(graphql.GraphQLInt ) }
+      },
+      resolve: (parent, args) => {
+        const newTask = new Task({
+          title: args.title,
+          weight: args.weight,
+          description: args.description,
+          projectId: args.projectId
+        });
+        return newTask.save();
+      }
+    },
+  })
+})
