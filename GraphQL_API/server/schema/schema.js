@@ -104,8 +104,3 @@ const Mutation = new graphql.GraphQLObjectType({
     },
   })
 })
-
-module.exports = new graphql.GraphQLSchema({
-  query:RootQuery,
-  mutation: Mutation
-});
