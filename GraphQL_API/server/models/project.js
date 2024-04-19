@@ -1,3 +1,4 @@
+//create a new schema
 const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
