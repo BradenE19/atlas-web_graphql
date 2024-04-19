@@ -9,6 +9,7 @@ const getTasksQuery = gql `
   }
 `;
 
+
 const getProjectsQuery = gql `
   {
     projects {
