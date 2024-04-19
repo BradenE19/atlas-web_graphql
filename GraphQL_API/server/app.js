@@ -1,3 +1,4 @@
+//app http request and database connection
 const express = require('express');
 const {graphqlHTTP} = require('express-graphql');
 const mongoose = require('mongoose');
