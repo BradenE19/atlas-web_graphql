@@ -1,3 +1,4 @@
+//Project schema queries
 const graphql = require('graphql');
 const _ = require('lodash');
 const Project = require('../models/project');
